@@ -1,5 +1,6 @@
-Trying to learning Agda through the [HoTTEST Summer School](https://github.com/martinescardo/HoTTEST-Summer-School)
+Trying to learning Agda through the [HoTTEST Summer School](https://github.com/martinescardo/HoTTEST-Summer-School).
 
+The $K$ axiom.
 ```agda
 {-# OPTIONS --without-K --safe #-} 
 
