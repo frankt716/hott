@@ -1,3 +1,5 @@
+Trying to learning Agda through the [HoTTEST Summer School](https://github.com/martinescardo/HoTTEST-Summer-School)
+
 ```agda
 {-# OPTIONS --without-K --safe #-} 
 
