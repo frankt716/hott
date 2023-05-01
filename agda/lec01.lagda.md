@@ -55,7 +55,7 @@ data ℕ : Type where
 The elimination principle is the familiar mathematical induction. The nondep version is primitive recursion. Let's define the nondep explicitly rather than using ℕ-elim.
 Recall that to define a function `g : ℕ → A`, we need
 - a base case `z`
-- a "at step" function `f : ℕ → A → A`
+- a "next step" function `f : ℕ → A → A`
 so we have `g 0 = z`, `g 1 = f 0 z`, `g 2 = f 1 (f 0 z)`, ...
 ```agda
 ℕ-elim : {A : ℕ → Type}
