@@ -184,7 +184,7 @@ data _∔_ (A B : Type) : Type where
 ∔-nondep-elim = ∔-elim
 ```
 
-Finally, lets define the identity type. The elimination principle for the identity type is also known as *path induction*.
+Finally, let's define the identity type. The elimination principle for the identity type is also known as *path induction*.
 ```agda
 data _≡_ {A : Type} : A → A → Type where
   refl : (x : A) → x ≡ x
