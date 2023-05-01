@@ -1,4 +1,4 @@
-Trying to learning Agda through the [HoTTEST Summer School](https://github.com/martinescardo/HoTTEST-Summer-School).
+Trying to learn Agda through the [HoTTEST Summer School](https://github.com/martinescardo/HoTTEST-Summer-School).
 
 The K axiom is not consistent with hott so we need to turn it off. We also need to turn off experimental features to avoid inconsistency.
 ```agda
