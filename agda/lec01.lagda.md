@@ -4,14 +4,14 @@ The K axiom is not consistent with hott so we need to turn it off. We also need 
 ```agda
 {-# OPTIONS --without-K --safe #-} 
 ```
-In Agda, types are Set. We redefine this so it's more consistent with hott's terminology.
+In Agda, types are `Set`. We redefine this so it's more consistent with hott's terminology.
 ```agda
 module lec01 where
 
 Type = Set
 ```
 
-`Bool` is a simple data type. To define a type, we define its introduction elimination rules.
+`Bool` is a simple data type. To define a type, we define its introduction and elimination rules.
 ```agda
 data Bool : Type where
   true false : Bool
