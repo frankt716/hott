@@ -1,6 +1,6 @@
 Trying to learning Agda through the [HoTTEST Summer School](https://github.com/martinescardo/HoTTEST-Summer-School).
 
-The $K$ axiom is not consistent with hott so we need to turn it off. We also need to turn off experimental features to avoid inconsistency.
+The K axiom is not consistent with hott so we need to turn it off. We also need to turn off experimental features to avoid inconsistency.
 ```agda
 {-# OPTIONS --without-K --safe #-} 
 ```
@@ -72,6 +72,13 @@ so we have `g 0 = z`, `g 1 = f 0 z`, `g 2 = f 1 (f 0 z)`, ...
 ℕ-nondep-elim a f n = f n a
 ```
 
+Let's define the addition function.
+```agda
+_+_ : ℕ → ℕ → ℕ
+zero + y = y
+succ x + y = succ (x + y)
+```
+
 Now, we define list. The list type family is indexed by a type, allowing us to have a list of naturals, a list of lists, etc.
 Note that the nondep version of `List-elim` is the usual `fold`. 
 ```agda
@@ -97,43 +104,69 @@ sample-list₀ : List ℕ
 sample-list₀ = 0 :: 1 :: 2 :: 3 :: []
 ```
 
-We can define the `length` function. We can define it using List-elim.
+We can define the `length` function. We can also define it using `List-elim`.
 ```agda
 length : {X : Type} → List X → ℕ
 length [] = 0
 length (_ :: xs) = succ (length (xs))
 
 length' : {X : Type} → List X → ℕ
+-- The length of x :: xs is succ x₁ where x₁ is the length of xs
+--                            ↓
 length' = List-elim 0 (λ _ _ x₁ → succ x₁)
+--                  ↑
+-- the empty list has length 0
 ```
 
+Let's define the list concatenation function.
+```agda
+_++_ : {X : Type} → List X → List X → List X
+[] ++ ys = ys
+(x :: xs) ++ ys = x :: (xs ++ ys)
+```
+
+Now, let's define the empty type and the unit type.
 ```agda
 data 𝟘 : Type where
+
+𝟘-elim : {A : 𝟘 → Type}
+  → (x : 𝟘) → A x
+𝟘-elim ()
+
+𝟘-nondep-elim : {A : Type} → 𝟘 → A
+𝟘-nondep-elim ()
 
 data 𝟙 : Type where
   ⋆ : 𝟙
 
-_≡ℕ_ : ℕ → ℕ → Type
-zero ≡ℕ zero = 𝟙
-zero ≡ℕ succ y = 𝟘
-succ x ≡ℕ zero = 𝟘
-succ x ≡ℕ succ y = x ≡ℕ y
-infix 0 _≡ℕ_
+𝟙-elim : {A : 𝟙 → Type}
+  → A ⋆
+  → (x : 𝟙) → A x
+𝟙-elim a₀ ⋆ = a₀
 
-ℕ-refl : (x : ℕ) → x ≡ℕ x
+𝟙-nondep-elim : {A : Type} → A → 𝟙 → A
+𝟙-nondep-elim = 𝟙-elim
+```
+
+Now, let's define a specialized equality type on ℕ and prove that `x ≣ x` for all `x : ℕ`.
+```agda
+_≣_ : ℕ → ℕ → Type
+zero ≣ zero = 𝟙
+zero ≣ succ y = 𝟘
+succ x ≣ zero = 𝟘
+succ x ≣ succ y = x ≣ y
+infix 0 _≣_
+
+ℕ-refl : (x : ℕ) → x ≣ x
 ℕ-refl zero = ⋆
 ℕ-refl (succ x) = ℕ-refl x
+```
 
-_++_ : {A : Type} → List A → List A → List A
-[] ++ ys = ys
-(x :: xs) ++ ys = x :: (xs ++ ys)
-
-_+_ : ℕ → ℕ → ℕ
-zero + y = y
-succ x + y = succ (x + y)
-
-lh : {X : Type} (xs ys : List X)
-  → length (xs ++ ys) ≡ℕ length xs + length ys
+Finally, we can prove that `length` is a monoid homomorphism. We use the `where` notation here to illustrate that you can write your proof this way.
+```agda
+lh : {X : Type} (xs ys : List X) → length (xs ++ ys) ≣ length xs + length ys
 lh [] ys = ℕ-refl (length ys)
-lh (x :: xs) ys = lh xs ys
+lh (x :: xs) ys = h where
+  h : length (xs ++ ys) ≣ (length xs + length ys)
+  h = lh xs ys
 ```
