@@ -3,7 +3,7 @@ Trying to learn Agda through the [HoTTEST Summer School](https://github.com/mart
 ```agda
 {-# OPTIONS --without-K --safe #-}
 module lec02 where
-open import lec01 hiding (𝟙 ; 𝟙-elim ; 𝟙-nondep-elim)
+open import lec01 hiding (𝟙 ; 𝟙-elim ; 𝟙-nondep-elim) public
 ```
 
 We can define ¬ in terms of 𝟘.
@@ -194,5 +194,10 @@ infix 0 _≡_
   → ({x : A} → B (refl x))
   → {x y : A} → (p : x ≡ y) → B p
 ≡-elim f (refl _) = f
+
+≡-nondep-elim : {A : Type} {B : A → A → Type}
+  → ({x : A} → B x x)
+  → {x y : A} → x ≡ y → B x y
+≡-nondep-elim = ≡-elim
 ```
-Apparently, with axiom K, `≡-elim` is equivalent to pattern matching. I've not figured out what that means exactly though.
+Apparently, without axiom K, `≡-elim` is equivalent to pattern matching. I've not figured out what that means exactly though.
