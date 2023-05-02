@@ -10,6 +10,7 @@ Last time, we talked about equalities. Equalities should be
 - Reflexive
 - Symmetric
 - Transitive
+
 Well, reflexivity should be easy.
 ```agda
 ≡-refl : {A : Type} {x : A} → x ≡ x
