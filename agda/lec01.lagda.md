@@ -74,6 +74,7 @@ so we have `g 0 = z`, `g 1 = f 0 z`, `g 2 = f 1 (f 0 z)`, ...
 
 Let's define the addition function.
 ```agda
+infixl 20 _+_
 _+_ : ℕ → ℕ → ℕ
 zero + y = y
 succ x + y = succ (x + y)

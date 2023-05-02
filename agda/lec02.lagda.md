@@ -282,3 +282,25 @@ inf-many-primes : Type
 inf-many-primes = (n : ℕ) → Σ p ꞉ ℕ , (p ≥ n) × is-prime p
 ```
 We can prove `inf-many-primes` because for any `n`, we can construct a prime number larger than `n`. The construction goes as follows: for any `n`, compute a list of prime numbers at most `n`, compute the product of these prime numbers and then add 1 to it. This is a prime number larger than `n`.
+
+```agda
++-zero : (n : ℕ) → n + 0 ≡ n
++-zero zero = refl zero
++-zero (succ n) = ap succ (+-zero n)
+
++-succ-comm : (n m : ℕ) → succ n + m ≡ n + (succ m)
++-succ-comm zero m = refl (succ m)
++-succ-comm (succ n) m = ap succ (+-succ-comm n m)
+
++-comm : (n m : ℕ) → n + m ≡ m + n
++-comm zero m = (+-zero m)⁻¹
++-comm (succ n) m = p₁ ∙ p₂ where
+  p₁ : succ (n + m) ≡ succ (m + n)
+  p₁ = ap succ (+-comm n m)
+  p₂ : succ (m + n) ≡ m + (succ n)
+  p₂ = +-succ-comm m n
+
++-assoc : (a b c : ℕ) → a + b + c ≡ a + (b + c)
++-assoc zero b c = refl (b + c)
++-assoc (succ a) b c = ap succ (+-assoc a b c)
+```
