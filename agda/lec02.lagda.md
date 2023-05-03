@@ -303,4 +303,20 @@ We can prove `inf-many-primes` because for any `n`, we can construct a prime num
 +-assoc : (a b c : ℕ) → a + b + c ≡ a + (b + c)
 +-assoc zero b c = refl (b + c)
 +-assoc (succ a) b c = ap succ (+-assoc a b c)
+
+*-zero : (n : ℕ) → n * 0 ≡ 0
+*-zero zero = refl zero
+*-zero (succ n) = p₁ ∙ p₂ where
+  p₁ : n * 0 + 0 ≡ n * 0
+  p₁ = +-zero (n * zero)
+  p₂ : n * 0 ≡ 0
+  p₂ = *-zero n
+
+*-one : (n : ℕ) → n * 1 ≡ n
+*-one zero = refl zero
+*-one (succ n) = p₁ ∙ p₂ where
+  p₁ : n * 1 + 1 ≡ 1 + n * 1
+  p₁ = +-comm (n * 1) 1
+  p₂ : 1 + n * 1 ≡ succ n
+  p₂ = ap succ (*-one n)
 ```
