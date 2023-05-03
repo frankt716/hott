@@ -54,9 +54,9 @@ data ℕ : Type where
 
 The elimination principle is the familiar mathematical induction. The nondep version is primitive recursion. Let's define the nondep explicitly rather than using ℕ-elim.
 Recall that to define a function `g : ℕ → A` by primitive recursion, we need
-- a base case `z`
+- a base case `a`
 - a "next step" function `f : ℕ → A → A`
-so we have `g 0 = z`, `g 1 = f 0 z`, `g 2 = f 1 (f 0 z)`, ...
+so we have `g 0 = a`, `g 1 = f 0 a`, `g 2 = f 1 (f 0 a)`, ...
 ```agda
 ℕ-elim : {A : ℕ → Type}
   → A zero
@@ -69,7 +69,8 @@ so we have `g 0 = z`, `g 1 = f 0 z`, `g 2 = f 1 (f 0 z)`, ...
   → A
   → (ℕ → A → A)
   → ℕ → A
-ℕ-nondep-elim a f n = f n a
+ℕ-nondep-elim a f zero = a
+ℕ-nondep-elim a f (succ n) = f n a
 ```
 
 Let's define the addition function.
