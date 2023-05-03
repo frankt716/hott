@@ -1,6 +1,6 @@
 Trying to learn Agda through the [HoTTEST Summer School](https://github.com/martinescardo/HoTTEST-Summer-School).
 
-The K axiom is not consistent with hott so we need to turn it off. We also need to turn off experimental features to avoid inconsistency.
+The K axiom is not consistent with hott (even though we have not introduced the univalence axiom) so we need to turn it off. We also need to turn off experimental features to avoid inconsistency.
 ```agda
 {-# OPTIONS --without-K --safe #-} 
 ```
@@ -53,7 +53,7 @@ data ℕ : Type where
 ```
 
 The elimination principle is the familiar mathematical induction. The nondep version is primitive recursion. Let's define the nondep explicitly rather than using ℕ-elim.
-Recall that to define a function `g : ℕ → A`, we need
+Recall that to define a function `g : ℕ → A` by primitive recursion, we need
 - a base case `z`
 - a "next step" function `f : ℕ → A → A`
 so we have `g 0 = z`, `g 1 = f 0 z`, `g 2 = f 1 (f 0 z)`, ...
