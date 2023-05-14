@@ -70,7 +70,7 @@ so we have `g 0 = z`, `g 1 = f 0 z`, `g 2 = f 1 (f 0 z)`, ...
   → (ℕ → A → A)
   → ℕ → A
 ℕ-nondep-elim z f zero = z
-ℕ-nondep-elim z f (succ n) = f n z
+ℕ-nondep-elim z f (succ n) = f n (ℕ-nondep-elim z f n)
 ```
 
 Let's define the addition function.
