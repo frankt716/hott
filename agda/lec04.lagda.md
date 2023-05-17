@@ -1,14 +1,67 @@
 Trying to learn Agda through the [HoTTEST Summer School](https://github.com/martinescardo/HoTTEST-Summer-School).
 
+A circle consists of a base point and a loop around the base point.
 ```agda
 {-# OPTIONS --without-K --rewriting #-}
 open import prelude
 
 module lec04 where
   postulate
-    S1 : Type
-    base : S1
+    S¹ : Type
+    base : S¹
     loop : base ≡ base
+```
+
+To define a function out of a circle, it suffices to supply an element `x : X` and a loop around it `l : x ≡ x`. The function defined by the recursor `S¹-rec` ought to satisfy the following defining equalities:
+- `(S¹-rec x l) base :≡ x`, and
+- `ap (S¹-rec x l) loop :≡ l`.
+The second equality does not quite type check in Agda because `ap (S¹-rec x l) loop : (S¹-rec x l) base ≡ (S¹-rec x l) base`, but `l : x ≡ x`. Agda does not know that we are treating `(S¹-rec x l) base ≡ x` as a definitional equality so we ask Agda to treat `(S¹-rec x l) base ≡ x` as a definitional equality, allowing us to assert what we want.
+```agda
+  postulate
+    S¹-rec : {X : Type} (x : X) (l : x ≡ x) → S¹ → X
+    S¹-rec-base : {X : Type} (x : X) (l : x ≡ x) → (S¹-rec x l) base ≡ x
+
+  {-# BUILTIN REWRITE _≡_ #-}
+  {-# REWRITE S¹-rec-base #-}
+  postulate
+    S¹-rec-loop : {X : Type} (x : X) (l : x ≡ x) → ap (S¹-rec x l) loop ≡ l
+```
+
+Alternatively, we can define a (two-point) circle as follows:
+```agda
+  postulate
+    C¹ : Type
+    north : C¹
+    south : C¹
+    west : north ≡ south
+    east : north ≡ south
+
+    C¹-rec : {X : Type} (n s : X) (w e : n ≡ s) → C¹ → X
+    C¹-rec-north : {X : Type} (n s : X) (w e : n ≡ s) → (C¹-rec n s w e) north ≡ n
+    C¹-rec-south : {X : Type} (n s : X) (w e : n ≡ s) → (C¹-rec n s w e) south ≡ s
+  {-# REWRITE C¹-rec-north #-}
+  {-# REWRITE C¹-rec-south #-}
+  postulate
+    C¹-rec-west : {X : Type} (n s : X) (w e : n ≡ s) → ap (C¹-rec n s w e) west ≡ w
+    C¹-rec-east : {X : Type} (n s : X) (w e : n ≡ s) → ap (C¹-rec n s w e) east ≡ e
+```
+
+We can show that there are functions `to : S¹ ↔ C¹ : from`.
+```agda
+  to : S¹ → C¹
+  to = S¹-rec north (east ∙ ! west)
+
+  from : C¹ → S¹
+  from = C¹-rec base base (refl _) loop
+
+  from-to-north : to (from north) ≡ north
+  from-to-north = refl _
+
+  from-to-south : to (from south) ≡ south
+  from-to-south = west
+
+  to-from-base : from (to base) ≡ base
+  to-from-base = refl _
 ```
 
 Groupoid laws and their applications.
@@ -40,33 +93,19 @@ Groupoid laws and their applications.
   example-path : base ≡ base
   example-path = loop ∙ ! loop ∙ loop
 
-  example : example-path ≡ loop [ base ≡ base [ S1 ] ]
+  example : example-path ≡ loop [ base ≡ base [ S¹ ] ]
   example = (loop ∙ ! loop) ∙ loop ≡⟨ ap (λ H → H ∙ loop) (!-inv-r loop) ⟩
             refl _ ∙ loop ≡⟨ ∙-unit-l loop ⟩
             loop ∎
 ```
 
-Circle recursion. To define a function from the circle type `S1` into another type `X`, provide `x : X` to serve as the "base point" and a path `l : x ≡ x` to serve as the "loop".
+Let's write a function `S¹ → S¹`. This function winds around the same circle twice.
 ```agda
-  postulate
-    S1-rec : {X : Type} (x : X) (l : x ≡ x [ X ]) → (S1 → X)
-    S1-rec-base : {X : Type} (x : X) (l : x ≡ x)
-                → (S1-rec x l) base ≡ x
-
-  {-# BUILTIN REWRITE _≡_ #-}
-  {-# REWRITE S1-rec-base #-}
-  postulate
-    S1-rec-loop : {X : Type} (x : X) (l : x ≡ x)
-                → ap (S1-rec x l) loop ≡ l
-```
-
-Let write a function `S1 → S1`. This function winds around the same circle twice.
-```agda
-  double : S1 → S1
-  double = S1-rec base (loop ∙ loop)
+  double : S¹ → S¹
+  double = S¹-rec base (loop ∙ loop)
 
   double-loop : ap double loop ≡ loop ∙ loop
-  double-loop = S1-rec-loop _ _
+  double-loop = S¹-rec-loop _ _
 
   ap-∙ : {A B : Type} {f : A → B} {x y z : A}
          (p : x ≡ y)
@@ -78,44 +117,7 @@ Let write a function `S1 → S1`. This function winds around the same circle twi
   double-2-loops =
     ap double (loop ∙ loop) ≡⟨ ap-∙ loop loop ⟩
     ap double loop ∙ ap double loop ≡⟨ ap₂ (λ p q → p ∙ q)
-                                           (S1-rec-loop _ _)
-                                           (S1-rec-loop _ _) ⟩
+                                           (S¹-rec-loop _ _)
+                                           (S¹-rec-loop _ _) ⟩
     (loop ∙ loop) ∙ (loop ∙ loop) ∎
-```
-
-Let's define a two point circle.
-```agda
-  postulate
-    Circle2 : Type
-    north : Circle2
-    south : Circle2
-    west : north ≡ south
-    east : north ≡ south
-    Circle2-rec : {X : Type} (n : X) (s : X) (w : n ≡ s) (e : n ≡ s)
-                → Circle2 → X
-
-    Circle2-rec-north : {X : Type} (n : X) (s : X) (w : n ≡ s) (e : n ≡ s)
-                      → Circle2-rec n s w e north ≡ n
-    Circle2-rec-south : {X : Type} (n : X) (s : X) (w : n ≡ s) (e : n ≡ s)
-                      → Circle2-rec n s w e south ≡ s
-                      
-  {-# REWRITE Circle2-rec-north #-}
-  {-# REWRITE Circle2-rec-south #-}
-  postulate
-    Circle2-rec-west : {X : Type} (n : X) (s : X) (w : n ≡ s) (e : n ≡ s)
-                     → ap (Circle2-rec n s w e) west ≡ w
-    Circle2-rec-east : {X : Type} (n : X) (s : X) (w : n ≡ s) (e : n ≡ s)
-                     → ap (Circle2-rec n s w e) east ≡ e
-
-  to : S1 → Circle2
-  to = S1-rec north (east ∙ ! west)
-
-  from : Circle2 → S1
-  from = Circle2-rec base base (refl _) loop
-
-  from-to-north : to (from north) ≡ north
-  from-to-north = refl north
-
-  from-to-south : to (from south) ≡ south
-  from-to-south = west
 ```
